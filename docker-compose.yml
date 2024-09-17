@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:13
+    container_name: rpg-planet-postgres
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - rpg-planet-network
+
+  web:
+    build: .
+    image: rpg-planet-backend
+    container_name: rpg-planet-backend
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    volumes:
+      - .:/app
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db
+    networks:
+      - rpg-planet-network
+
+networks:
+  rpg-planet-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
